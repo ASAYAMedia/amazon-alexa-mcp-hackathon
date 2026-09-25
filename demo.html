@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Context-Aware Personal Assistant MCP Server - Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Monospace';
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { 
+      color: #58a6ff; 
+      border-bottom: 1px solid #30363d; 
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .subtitle { color: #8b949e; margin-bottom: 30px; }
+    .terminal {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .terminal-header {
+      background: #21262d;
+      border-bottom: 1px solid #30363d;
+      padding: 10px 14px;
+      display: flex;
+      gap: 8px;
+    }
+    .traffic-light { width: 12px; height: 12px; border-radius: 50%; }
+    .tl-red { background: #ff5f57; }
+    .tl-yellow { background: #ffbd2e; }
+    .tl-green { background: #28ca42; }
+    .terminal-body {
+      padding: 20px;
+      min-height: 400px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .prompt { color: #7ee787; }
+    .command { color: #f0f6fc; }
+    .output { color: #8b949e; margin: 4px 0 16px; white-space: pre-wrap; }
+    .output-json { color: #a5d6ff; }
+    .output-success { color: #7ee787; }
+    .output-error { color: #ff7b72; }
+    .section { margin: 30px 0; }
+    .section-title { 
+      color: #d2a8ff; 
+      font-size: 16px; 
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::before { content: '◆'; color: #58a6ff; }
+    .highlight { color: #ffd740; }
+    .arch-box {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 16px 0;
+      font-size: 13px;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+    .arch-box .arrow { color: #58a6ff; }
+    .arch-box .component { color: #f0f6fc; font-weight: 600; }
+    .arch-box .tech { color: #7ee787; }
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+    .badge {
+      background: #21262d;
+      border: 1px solid #30363d;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #8b949e;
+    }
+    .badge.primary { background: #1f6feb; color: #fff; border-color: #1f6feb; }
+    .badge.success { background: #238636; color: #fff; border-color: #238636; }
+    .badge.warning { background: #9e6a03; color: #fff; border-color: #9e6a03; }
+    .links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 20px; }
+    .links a { color: #58a6ff; text-decoration: none; }
+    .links a:hover { text-decoration: underline; }
+    .progress-bar {
+      height: 4px;
+      background: #21262d;
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #58a6ff, #d2a8ff);
+      animation: progress 2s ease-in-out infinite;
+    }
+    @keyframes progress {
+      0% { width: 0%; transform: translateX(0); }
+      50% { width: 60%; transform: translateX(40%); }
+      100% { width: 0%; transform: translateX(100%); }
+    }
+    .typing { 
+      display: inline-block; 
+      width: 2ch; 
+      background: #58a6ff; 
+      animation: blink 1s infinite; 
+      vertical-align: text-bottom;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧠 Context-Aware Personal Assistant MCP Server</h1>
+    <p class="subtitle">Persistent memory, tasks & calendar for AI assistants via MCP 2025-11-25 Streamable HTTP</p>
+
+    <div class="badges">
+      <span class="badge primary">MCP 2025-11-25</span>
+      <span class="badge success">Streamable HTTP + SSE</span>
+      <span class="badge warning">11 Tools / 5 Resources</span>
+      <span class="badge">Docker Ready</span>
+      <span class="badge">Privacy-First</span>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill"></div></div>
+
+    <!-- Architecture -->
+    <div class="section">
+      <div class="section-title">Architecture</div>
+      <div class="arch-box">
+<span class="component">User</span> <span class="arrow">→</span> <span class="component">Alexa+ / Client</span> <span class="arrow">→</span> <span class="component">MCP HTTP Server</span> <span class="arrow">→</span> <span class="component">Nemotron (Nebius)</span> <span class="arrow">→</span> <span class="component">Persistent JSON Storage</span>
+      </div>
+      <p>Full MCP 2025-11-25 Streamable HTTP compliance with SSE for real-time updates. Self-hosted, privacy-first, production-ready.</p>
+    </div>
+
+    <!-- Live Terminal Demo -->
+    <div class="section">
+      <div class="section-title">Live Demo</div>
+      <div class="terminal">
+        <div class="terminal-header">
+          <div class="traffic-light tl-red"></div>
+          <div class="traffic-light tl-yellow"></div>
+          <div class="traffic-light tl-green"></div>
+          <span style="margin-left:auto; color:#8b949e; font-size:12px;">localhost:8000</span>
+        </div>
+        <div class="terminal-body" id="terminal"></div>
+      </div>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="section">
+      <div class="section-title">Tech Stack</div>
+      <div class="badges">
+        <span class="badge"><span class="tech">Python 3.11</span></span>
+        <span class="badge"><span class="tech">MCP SDK</span></span>
+        <span class="badge"><span class="tech">FastAPI</span></span>
+        <span class="badge"><span class="tech">Pydantic</span></span>
+        <span class="badge"><span class="tech">httpx</span></span>
+        <span class="badge"><span class="tech">Docker</span></span>
+        <span class="badge"><span class="tech">Nebius</span></span>
+        <span class="badge"><span class="tech">Nemotron</span></span>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div class="links">
+      <a href="https://github.com/ASAYAMedia/amazon-alexa-mcp-hackathon" target="_blank">📦 GitHub Repository</a>
+      <a href="https://devpost.com/software/context-aware-personal-assistant-mcp-server-for-alexa" target="_blank">🏆 Amazon Submission</a>
+      <a href="https://nebiusglobalaihackathon.devpost.com/" target="_blank">🚀 Nebius Submission</a>
+    </div>
+  </div>
+
+  <script>
+    const demoSteps = [
+      { 
+        cmd: 'curl -X POST localhost:8000/mcp \\\n  -H "Mcp-Session-Id: demo" \\\n  -d \'{"jsonrpc":"2.0","id":"1","method":"tools/call","params":{"name":"add_memory","arguments":{"content":"Quarterly review due Friday, prepare slides tonight","tags":["work","urgent"],"importance":0.9}}}\'',
+        out: '{"jsonrpc":"2.0","id":"1","result":{"content":[{"type":"text","text":"Memory added: mem_1727123456.789"}]}}',
+        delay: 1500
+      },
+      { 
+        cmd: 'curl -X POST localhost:8000/mcp \\\n  -H "Mcp-Session-Id: demo" \\\n  -d \'{"jsonrpc":"2.0","id":"2","method":"tools/call","params":{"name":"search_memories","arguments":{"query":"quarterly review"}}}\'',
+        out: '{"jsonrpc":"2.0","id":"2","result":{"content":[{"type":"text","text":"[{\\"id\\":\\"mem_1727123456.789\\",\\"content\\":\\"Quarterly review due Friday, prepare slides tonight\\",\\"tags\\":[\\"work\\",\\"urgent\\"],\\"importance\\":0.9,\\"timestamp\\":\\"2026-09-24T15:30:56.789Z\\"}]"]}}',
+        delay: 1500
+      },
+      { 
+        cmd: 'curl -X POST localhost:8000/mcp \\\n  -H "Mcp-Session-Id: demo" \\\n  -d \'{"jsonrpc":"2.0","id":"3","method":"tools/call","params":{"name":"create_task","arguments":{"title":"Prepare Q3 slides","priority":5,"due_date":"2026-10-25T18:00:00","tags":["work"]}}}\'',
+        out: '{"jsonrpc":"2.0","id":"3","result":{"content":[{"type":"text","text":"Task created: task_1727123457.123 - Prepare Q3 slides"}]}}',
+        delay: 1500
+      },
+      { 
+        cmd: 'curl -X POST localhost:8000/mcp \\\n  -H "Mcp-Session-Id: demo" \\\n  -d \'{"jsonrpc":"2.0","id":"4","method":"tools/call","params":{"name":"get_proactive_suggestions","arguments":{}}}\'',
+        out: '{"jsonrpc":"2.0","id":"4","result":{"content":[{"type":"text","text":"[\\"You have \\u0027Prepare Q3 slides\\u0027 due in 2 days (high priority).\\",\\"You have a meeting with Sarah at 2 PM today.\\"]"]}}',
+        delay: 1500
+      },
+      { 
+        cmd: 'curl -X POST localhost:8000/mcp \\\n  -H "Mcp-Session-Id: demo" \\\n  -d \'{"jsonrpc":"2.0","id":"5","method":"tools/call","params":{"name":"add_event","arguments":{"title":"Team Sync","start_time":"2026-10-24T14:00:00","end_time":"2026-10-24T14:30:00","attendees":["Sarah","Mike"]}}}\'',
+        out: '{"jsonrpc":"2.0","id":"5","result":{"content":[{"type":"text","text":"Event created: evt_1727123458.456 - Team Sync"}]}}',
+        delay: 1500
+      },
+      { 
+        cmd: 'curl -X POST localhost:8000/mcp \\\n  -H "Mcp-Session-Id: demo" \\\n  -d \'{"jsonrpc":"2.0","id":"6","method":"tools/call","params":{"name":"get_context","arguments":{}}}\'',
+        out: '{\n  "current_time": "2026-10-24T10:15:00.000Z",\n  "upcoming_events_count": 1,\n  "next_event": "Team Sync",\n  "pending_tasks_count": 3,\n  "high_priority_tasks": ["Prepare Q3 slides"],\n  "recent_memories": ["Quarterly review due Friday, prepare slides tonight"]\n}',
+        delay: 2000
+      }
+    ];
+
+    const terminal = document.getElementById('terminal');
+    let stepIndex = 0;
+
+    function typeStep() {
+      if (stepIndex >= demoSteps.length) {
+        stepIndex = 0;
+        setTimeout(() => {
+          terminal.innerHTML = '';
+          typeStep();
+        }, 3000);
+        return;
+      }
+
+      const step = demoSteps[stepIndex];
+      
+      // Add prompt + command
+      const promptDiv = document.createElement('div');
+      promptDiv.innerHTML = '<span class="prompt">$</span> <span class="command">' + escapeHtml(step.cmd).replace(/\n/g, '<br><span class="prompt">  </span> ') + '<span class="typing"></span></span>';
+      terminal.appendChild(promptDiv);
+
+      // Animate typing
+      const typingEl = promptDiv.querySelector('.typing');
+      setTimeout(() => {
+        typingEl.remove();
+        
+        // Add output
+        const outDiv = document.createElement('div');
+        outDiv.className = 'output output-json';
+        outDiv.textContent = step.out;
+        terminal.appendChild(outDiv);
+        
+        // Scroll
+        terminal.scrollTop = terminal.scrollHeight;
+        
+        stepIndex++;
+        setTimeout(typeStep, step.delay);
+      }, 800);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Start demo
+    setTimeout(typeStep, 1000);
+  </script>
+</body>
+</html>
